@@ -14,6 +14,38 @@ def fare_price(distance, different_regions, hubs_in_dest_region):
     return calculated_fare_price
 
 class Station: #represents single station
+    def __init__(self, name, region, crs, lat, lon, hub):
+        # Check and store name as a string
+        if not isinstance(name, str):
+            raise ValueError("Name must be a string")
+        self.name = name
+
+        # Check and store region as a string
+        if not isinstance(region, str):
+            raise ValueError("Region must be a string")
+        self.region = region
+
+        # Check and store CRS code as a 3-character string consisting of uppercase letters
+        if not isinstance(crs, str) or not crs.isalpha() or len(crs) != 3 or not crs.isupper():
+            raise ValueError("CRS code must be a 3-character string of uppercase letters")
+        self.crs = crs
+
+        # Check and store latitude as a decimal number in the range [-90, 90]
+        if not isinstance(lat, (float, int)) or lat < -90 or lat > 90:
+            raise ValueError("Latitude must be a decimal number in the range [-90, 90]")
+        self.lat = lat
+
+        # Check and store longitude as a decimal number in the range [-180, 180]
+        if not isinstance(lon, (float, int)) or lon < -180 or lon > 180:
+            raise ValueError("Longitude must be a decimal number in the range [-180, 180]")
+        self.lon = lon
+
+        # Check and store hub as a boolean value
+        if not isinstance(hub, bool):
+            raise ValueError("Hub must be a boolean value")
+        self.hub = hub
+    def __str__(self):
+        return f"Station(name='{self.name}', region='{self.region}', crs='{self.crs}', lat={self.lat}, lon={self.lon}, hub={self.hub})"
     def distance_to(self):
         raise NotImplementedError
 
