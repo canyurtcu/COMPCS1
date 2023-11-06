@@ -44,13 +44,27 @@ class Station: #represents single station
         if not isinstance(hub, bool):
             raise ValueError("Hub must be a boolean value")
         self.hub = hub
+
     def __str__(self):
-        return f"Station(name='{self.name}', region='{self.region}', crs='{self.crs}', lat={self.lat}, lon={self.lon}, hub={self.hub})"
+        return f"Station({self.crs}-{self.name}/{self.region}{'-hub' if self.hub else ''})"
+    
     def distance_to(self):
         raise NotImplementedError
 
 
 class RailNetwork: #brings together all the stations from a dataset 
+    def __init__(self, stations):
+        self.stations = {}
+        
+        for station in stations:
+            if station.crs in self.stations:
+                raise ValueError(f"Duplicate CRS code: {station.crs} is not allowed in the same RailNetwork")
+            
+            self.stations[station.crs] = station
+
+    def __str__(self):
+        return f"RailNetwork(stations={list(self.stations.values())}"
+    
     def regions(self):
         raise NotImplementedError
 
@@ -137,3 +151,16 @@ class RailNetwork: #brings together all the stations from a dataset
 
         plt.show()
         return
+
+
+brighton = Station("Brighton", "South East", "BTN", 50.829659, -0.141234, True)
+kings_cross = Station("London Kings Cross", "London", "KGX", 51.530827, -0.122907, True)
+edinburgh_park = Station("Edinburgh Park", "Scotland", "EDP", 55.927615, -3.307829, False)
+
+list_of_stations = [brighton, kings_cross, edinburgh_park]
+rail_network = RailNetwork(list_of_stations)
+
+print(f"List of stations passed in: {list_of_stations}")
+print(f"Stations in the network: {list(rail_network.stations.values())}")
+print(f"Keys of rail_network.stations: {list(rail_network.stations.keys())}")   #this operates as usual but it doesnt showcase the full string for some reason 06/11/2023
+
