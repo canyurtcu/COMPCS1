@@ -1,16 +1,24 @@
 import matplotlib.pyplot as plt
+import numpy as np
 
+def fare_price(distance, different_regions, hubs_in_dest_region): 
+    """
+    This function computes approximation of the cost of a rail fare between two stations.
 
-def fare_price(distance, different_regions, hubs_in_dest_region):
-    raise NotImplementedError
+    :param distance: Distance between two stations.
+    :param different_regions: it is a Boolean value where it is 1 if the stations belong to different regions, and 0 otherwise.
+    :param hubs_in_dest_region: Number of hub stations in the same region as the destination station.
+    :return: The fare price
+    """
+    calculated_fare_price = 1 + (distance * np.exp(-distance/100) * (1 + (different_regions * hubs_in_dest_region)/10))
+    return calculated_fare_price
 
-
-class Station:
+class Station: #represents single station
     def distance_to(self):
         raise NotImplementedError
 
 
-class RailNetwork:
+class RailNetwork: #brings together all the stations from a dataset 
     def regions(self):
         raise NotImplementedError
 
