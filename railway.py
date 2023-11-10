@@ -50,9 +50,21 @@ class Station: #represents single station
     def __str__(self):
         return f"Station({self.crs}-{self.name}/{self.region}{'-hub' if self.hub else ''})"
     
-    def distance_to(self):
-        raise NotImplementedError
+    def __repr__(self):
+        return f"Station({self.crs}-{self.name}/{self.region}{'-hub' if self.hub else ''})" #this doesnt work as intended, fix later
+    
+    def distance_to(self, other_station):
+        R = 6371
+        # Convert latitude and longitude from degrees to radians
+        lat1, lon1, lat2, lon2 = np.radians([self.lat, self.lon, other_station.lat, other_station.lon])
 
+        # Haversine formula
+        dlat = lat2 - lat1
+        dlon = lon2 - lon1
+        a = np.sin(dlat/2)**2 + np.cos(lat1)*np.cos(lat2)*np.sin(dlon/2)**2
+        c = 2 * np.arcsin(np.sqrt(a))
+        distance = R * c
+        return distance
 
 class RailNetwork: #brings together all the stations from a dataset 
     def __init__(self, stations):
@@ -155,22 +167,29 @@ class RailNetwork: #brings together all the stations from a dataset
         return
 
 
-brighton = Station("Brighton", "South East", "BTN", 50.829659, -0.141234, True) 
-kings_cross = Station("London Kings Cross", "London", "KGX", 51.530827, -0.122907, True)
-edinburgh_park = Station("Edinburgh Park", "Scotland", "EDP", 55.927615, -3.307829, False)
+# brighton = Station("Brighton", "South East", "BTN", 50.829659, -0.141234, True) 
+# kings_cross = Station("London Kings Cross", "London", "KGX", 51.530827, -0.122907, True)
+# edinburgh_park = Station("Edinburgh Park", "Scotland", "EDP", 55.927615, -3.307829, False)
  
-list_of_stations = [brighton, kings_cross, edinburgh_park]
-rail_network = RailNetwork(list_of_stations)
-
+# list_of_stations = [brighton, kings_cross, edinburgh_park]
+# rail_network = RailNetwork(list_of_stations)
 # print(f"List of stations passed in: {list_of_stations}")
 # print(f"Stations in the network: {list(rail_network.stations.values())}")
-print(f"Keys of rail_network.stations: {list(rail_network.stations.keys())}")   #this operates as usual but it doesnt showcase the full string for some reason 06/11/2023
+#print(f"Keys of rail_network.stations: {list(rail_network.stations.keys())}")   #this operates as usual but it doesnt showcase the full string for some reason 06/11/2023
 
-# if __name__ == "__main__":
-#     # Import read_rail_network function from utilities only when needed   
-#     from utilities import read_rail_network
+if __name__ == "__main__":
+    brighton = Station("Brighton", "South East", "BTN", 50.829659, -0.141234, True) 
+    kings_cross = Station("London Kings Cross", "London", "KGX", 51.530827, -0.122907, True)
+    edinburgh_park = Station("Edinburgh Park", "Scotland", "EDP", 55.927615, -3.307829, False)
 
-#     file_path = Path("uk_stations.csv")
-#     rail_network = read_rail_network(file_path)
-#     #for x in list(rail_network.stations.values()): print(x)
+    # Import read_rail_network function from utilities only when needed   
+    from utilities import read_rail_network
 
+    file_path = Path("uk_stations.csv")
+    rail_network = read_rail_network(file_path)
+    #for x in list(rail_network.stations.values()): print(x)
+
+    # BTN_to_KGX = brighton.distance_to(kings_cross)
+    # print(BTN_to_KGX)
+    print(brighton)
+    brighton
