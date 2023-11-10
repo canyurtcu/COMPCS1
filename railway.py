@@ -95,7 +95,16 @@ class RailNetwork: #brings together all the stations from a dataset
             return [station for station in self.stations.values() if station.hub and station.region == region]
 
     def closest_hub(self, s):
-        raise NotImplementedError
+        if s.region not in self.regions():
+            raise ValueError(f"Region '{s.region}' does not exist in the network.")
+
+        hub_stations_in_region = [sta for sta in self.hub_stations(s.region) if sta != s]
+
+        if not hub_stations_in_region:
+            raise ValueError(f"No hub stations in the region '{s.region}'.")
+
+        closest_hub_station = min(hub_stations_in_region, key=lambda sta: s.distance_to(sta))
+        return closest_hub_station
 
     def journey_planner(self, start, dest):
         raise NotImplementedError
@@ -198,6 +207,8 @@ if __name__ == "__main__":
     # BTN_to_KGX = brighton.distance_to(kings_cross)
     # print(BTN_to_KGX)
 
-    print("Unique Regions:", rail_network.regions())
-    print("Total Number of Stations:", rail_network.n_stations())
-    print(len(rail_network.hub_stations('North West')))
+    # print("Unique Regions:", rail_network.regions())
+    # print("Total Number of Stations:", rail_network.n_stations())
+    # print(len(rail_network.hub_stations('North West')))
+    edinburgh_park = Station("Edinburgh Park", "Scotland", "EDP", 55.927615, -3.307829, False)
+    print(rail_network.closest_hub(edinburgh_park))
