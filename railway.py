@@ -107,7 +107,32 @@ class RailNetwork: #brings together all the stations from a dataset
         return closest_hub_station
 
     def journey_planner(self, start, dest):
-        raise NotImplementedError
+        if start not in self.stations or dest not in self.stations:
+            raise ValueError("Invalid CRS codes. Both start and destination stations must exist in the network.")
+
+        start_station = self.stations[start]
+        dest_station = self.stations[dest]
+        closest_hub_start = self.closest_hub(start_station)
+        closest_hub_dest = self.closest_hub(dest_station)
+
+        # Check if the journey is within the same region or between hub stations
+        if start_station.region == dest_station.region:
+            # Case: A and B are within the same region
+            journey = [start_station, dest_station]
+        elif start_station.hub and dest_station.hub:
+            # Case: A and B are both hub stations
+            journey = [start_station, dest_station] 
+        elif start_station.hub and not dest_station.hub:
+            # Case: A is a hub while B isn't
+            journey = [start_station, closest_hub_dest, dest_station]
+        elif not start_station.hub and dest_station.hub:
+            # Case: A isn't a hub while B is
+            journey = [start_station, closest_hub_start, dest_station]
+        else:
+            # Case: A and B aren't hub stations
+            journey = [start_station, closest_hub_start, closest_hub_dest, dest_station]
+
+        return journey
 
     def journey_fare(self, start, dest, summary):
         raise NotImplementedError
@@ -193,9 +218,9 @@ class RailNetwork: #brings together all the stations from a dataset
 #print(f"Keys of rail_network.stations: {list(rail_network.stations.keys())}")   #this operates as usual but it doesnt showcase the full string for some reason 06/11/2023
 
 if __name__ == "__main__":
-    brighton = Station("Brighton", "South East", "BTN", 50.829659, -0.141234, True) 
-    kings_cross = Station("London Kings Cross", "London", "KGX", 51.530827, -0.122907, True)
-    edinburgh_park = Station("Edinburgh Park", "Scotland", "EDP", 55.927615, -3.307829, False)
+    # brighton = Station("Brighton", "South East", "BTN", 50.829659, -0.141234, True) 
+    # kings_cross = Station("London Kings Cross", "London", "KGX", 51.530827, -0.122907, True)
+    # edinburgh_park = Station("Edinburgh Park", "Scotland", "EDP", 55.927615, -3.307829, False)
 
     # Import read_rail_network function from utilities only when needed   
     from utilities import read_rail_network
@@ -210,5 +235,7 @@ if __name__ == "__main__":
     # print("Unique Regions:", rail_network.regions())
     # print("Total Number of Stations:", rail_network.n_stations())
     # print(len(rail_network.hub_stations('North West')))
-    edinburgh_park = Station("Edinburgh Park", "Scotland", "EDP", 55.927615, -3.307829, False)
-    print(rail_network.closest_hub(edinburgh_park))
+    # edinburgh_park = Station("Edinburgh Park", "Scotland", "EDP", 55.927615, -3.307829, False)
+    # print(rail_network.closest_hub(edinburgh_park))
+    print(rail_network.journey_planner("BTN", "KGX"))   
+
