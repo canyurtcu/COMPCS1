@@ -98,12 +98,21 @@ class RailNetwork: #brings together all the stations from a dataset
         if s.region not in self.regions():
             raise ValueError(f"Region '{s.region}' does not exist in the network.")
 
-        hub_stations_in_region = [sta for sta in self.hub_stations(s.region) if sta != s]
+        if s.hub:
+            return s  # If the station itself is a hub, return it
+
+        region = s.region
+
+        # Get all hub stations in the same region
+        hub_stations_in_region = [station for station in self.stations.values() if station.hub and station.region == region]
 
         if not hub_stations_in_region:
-            raise ValueError(f"No hub stations in the region '{s.region}'.")
+            # If there are no hub stations in the region, raise an appropriate error
+            raise ValueError(f"No hub stations in the region: {region}")
 
-        closest_hub_station = min(hub_stations_in_region, key=lambda sta: s.distance_to(sta))
+        # Find the closest hub station using the distance_to method
+        closest_hub_station = min(hub_stations_in_region, key=lambda hub: s.distance_to(hub))
+
         return closest_hub_station
 
     def journey_planner(self, start, dest):
@@ -134,8 +143,30 @@ class RailNetwork: #brings together all the stations from a dataset
 
         return journey
 
-    def journey_fare(self, start, dest, summary):
-        raise NotImplementedError
+    def journey_fare(self, start, dest, summary=False):
+        start_station = self.stations[start]
+        dest_station = self.stations[dest] 
+        closest_hub_start = self.closest_hub(start_station)
+        closest_hub_dest = self.closest_hub(dest_station)
+        # Use journey_planner to get the journey details
+        journey = self.journey_planner(start, dest)
+        # Calculate the fare for each leg of the journey
+        total_fare = 0.0
+        for i in range(len(journey) - 1):
+            leg_start = journey[i]
+            leg_dest = journey[i + 1]
+            leg_distance = leg_start.distance_to(leg_dest)
+            hubs_in_dest_region = sum(station.hub for station in self.stations.values() if station.region == leg_dest.region)
+            leg_fare = fare_price(leg_distance, leg_start.region != leg_dest.region, hubs_in_dest_region)
+            total_fare += leg_fare
+#        return f"Station({self.crs}-{self.name}/{self.region}{'-hub' if self.hub else ''})"
+        if summary:
+            # Print the summary
+            print(f"Journey from: {start_station.name} ({start}) to {dest_station.name} ({dest})")
+            print("Route:", " -> ".join(station.crs if station.crs == start or station.crs == dest else f"{station.crs} ({station.name})"for station in journey))
+            print(f"Fare: £{total_fare:.2f}")
+        else:
+            return total_fare
 
     def plot_fares_to(self, crs_code, save, ADDITIONAL_ARGUMENTS):
         raise NotImplementedError
@@ -237,5 +268,7 @@ if __name__ == "__main__":
     # print(len(rail_network.hub_stations('North West')))
     # edinburgh_park = Station("Edinburgh Park", "Scotland", "EDP", 55.927615, -3.307829, False)
     # print(rail_network.closest_hub(edinburgh_park))
-    print(rail_network.journey_planner("BTN", "KGX"))   
+    #print(rail_network.journey_planner("BTN", "KGX"))      
+    print(rail_network.journey_fare("ABW", "TQY", summary=True))
+
 
