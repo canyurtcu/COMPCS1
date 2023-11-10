@@ -80,13 +80,19 @@ class RailNetwork: #brings together all the stations from a dataset
         return f"RailNetwork(stations={list(self.stations.values())}"
     
     def regions(self):
-        raise NotImplementedError
+        unique_regions = set(station.region for station in self.stations.values())
+        return list(unique_regions)
 
     def n_stations(self):
-        raise NotImplementedError
+        return len(self.stations)
 
-    def hub_stations(self, region):
-        raise NotImplementedError
+    def hub_stations(self, region: str = None):
+        if region is None:
+            return [station for station in self.stations.values() if station.hub]
+        elif region not in self.regions():
+            raise ValueError(f"Region '{region}' does not exist in the network.")
+        else:
+            return [station for station in self.stations.values() if station.hub and station.region == region]
 
     def closest_hub(self, s):
         raise NotImplementedError
@@ -191,5 +197,7 @@ if __name__ == "__main__":
 
     # BTN_to_KGX = brighton.distance_to(kings_cross)
     # print(BTN_to_KGX)
-    print(brighton)
-    brighton
+
+    print("Unique Regions:", rail_network.regions())
+    print("Total Number of Stations:", rail_network.n_stations())
+    print(len(rail_network.hub_stations('North West')))
