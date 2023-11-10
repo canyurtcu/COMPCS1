@@ -1,5 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
+from pathlib import Path
+from typing import List, Dict
 
 def fare_price(distance, different_regions, hubs_in_dest_region): 
     """
@@ -16,7 +18,7 @@ def fare_price(distance, different_regions, hubs_in_dest_region):
 class Station: #represents single station
     def __init__(self, name, region, crs, lat, lon, hub):
         # Check and store name as a string
-        if not isinstance(name, str):
+        if not isinstance(name, str):   
             raise ValueError("Name must be a string")
         self.name = name
 
@@ -153,14 +155,22 @@ class RailNetwork: #brings together all the stations from a dataset
         return
 
 
-brighton = Station("Brighton", "South East", "BTN", 50.829659, -0.141234, True)
+brighton = Station("Brighton", "South East", "BTN", 50.829659, -0.141234, True) 
 kings_cross = Station("London Kings Cross", "London", "KGX", 51.530827, -0.122907, True)
 edinburgh_park = Station("Edinburgh Park", "Scotland", "EDP", 55.927615, -3.307829, False)
-
+ 
 list_of_stations = [brighton, kings_cross, edinburgh_park]
 rail_network = RailNetwork(list_of_stations)
 
-print(f"List of stations passed in: {list_of_stations}")
-print(f"Stations in the network: {list(rail_network.stations.values())}")
+# print(f"List of stations passed in: {list_of_stations}")
+# print(f"Stations in the network: {list(rail_network.stations.values())}")
 print(f"Keys of rail_network.stations: {list(rail_network.stations.keys())}")   #this operates as usual but it doesnt showcase the full string for some reason 06/11/2023
+
+# if __name__ == "__main__":
+#     # Import read_rail_network function from utilities only when needed   
+#     from utilities import read_rail_network
+
+#     file_path = Path("uk_stations.csv")
+#     rail_network = read_rail_network(file_path)
+#     #for x in list(rail_network.stations.values()): print(x)
 
