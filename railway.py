@@ -279,7 +279,7 @@ class RailNetwork: #brings together all the stations from a dataset
 
 if __name__ == "__main__":
     brighton = Station("Brighton", "South East", "BTN", 50.829659, -0.141234, True) 
-    kings_cross = Station("London Kings Cross", "London", "KGX", 51.530827, -0.122907, True)
+    #kings_cross = Station("London Kings Cross", "London", "KGX", 51.530827, -0.122907, True)
     # edinburgh_park = Station("Edinburgh Park", "Scotland", "EDP", 55.927615, -3.307829, False)
     #print(brighton)
     
@@ -300,7 +300,9 @@ if __name__ == "__main__":
     # print(rail_network.closest_hub(edinburgh_park))
     #print(rail_network.journey_planner("BTN", "KGX"))      
     #print(rail_network.journey_fare("ABW", "TQY", summary=True))
-    rail_network.plot_fares_to('KGX', save=True, bins=10)
-
+    #rail_network.plot_fares_to('KGX', save=True, bins=10)
+    #print(brighton)
+    repr()
+    
     
 
