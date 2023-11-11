@@ -26,8 +26,7 @@ def test_invalid_station_creation():  # Test creating a Station with invalid val
     assert e.match("CRS code must be a 3-character string of uppercase letters")
 
     with pytest.raises(ValueError) as e :   #Case: Latitude is greater than 90  
-        Station('Brighton', "South East", "BTN", 100, -0.141234, True) 
-    print("Actual error:",str(e.value))            
+        Station('Brighton', "South East", "BTN", 100, -0.141234, True)           
     assert e.match(re.escape("Latitude must be a decimal number in the range [-90, 90]"))
 
     with pytest.raises(ValueError) as e :   #Case: Latitude is less than -90  
@@ -68,3 +67,46 @@ def test_distance_to():
     expected_distance = R * c
 
     assert station_a.distance_to(station_b) == expected_distance
+
+def test_str_representation():
+    # Test the __str__ method
+    hub_station = Station("Hub Station", "Hub Region", "HUB", 0, 0, True)
+    non_hub_station = Station("Non-Hub Station", "Non-Hub Region", "NHB", 0, 0, False)
+    
+    assert str(hub_station) == "Station(HUB-Hub Station/Hub Region-hub)"
+    assert str(non_hub_station) == "Station(NHB-Non-Hub Station/Non-Hub Region)"
+
+#Add __repr__ when you have figured it out
+
+def test_railnetworkcreation():
+    station_a = Station("Station A", "Region A", "STA", 0, 0, True)
+    station_b = Station("Station B", "Region B", "STB", 0, 1, True)
+    list_of_stations = [station_a,station_b]
+    rail_network = RailNetwork(list_of_stations)
+    expected_rail_network = [station_a, station_b]
+    assert str(rail_network) == str(expected_rail_network)   #tests rail network creation
+
+def test_CRS_duplicate_railnetwork():
+    station_a = Station("Station A", "Region A", "STA", 0, 0, True) #tests for CRS duplicate in rail network creation
+    station_a_duplicate = Station("Station A", "Region A", "STA", 0, 1, True)
+    list_of_stations = [station_a,station_a_duplicate]
+
+    with pytest.raises(ValueError) as e:
+        RailNetwork(list_of_stations)
+    assert e.match(f"Duplicate CRS code: STA is not allowed in the same RailNetwork")
+
+def test_rail_network_regions():
+    station_a = Station("Station A", "Region A", "STA", 0, 0, True)
+    station_b = Station("Station B", "Region B", "STB", 0, 1, True)
+    list_of_stations = [station_a,station_b]
+    rail_network = RailNetwork(list_of_stations)
+    expected_region = ["Region A", "Region B"]
+    assert rail_network.regions() == expected_region    #tests region method
+
+def test_rail_network_n_stations():
+    station_a = Station("Station A", "Region A", "STA", 0, 0, True)
+    station_b = Station("Station B", "Region B", "STB", 0, 1, True)
+    list_of_stations = [station_a,station_b]
+    rail_network = RailNetwork(list_of_stations)
+    assert rail_network.n_stations() == 2   #tests n_stations method
+
