@@ -168,8 +168,37 @@ class RailNetwork: #brings together all the stations from a dataset
         else:
             return total_fare
 
-    def plot_fares_to(self, crs_code, save, ADDITIONAL_ARGUMENTS):
-        raise NotImplementedError
+    def plot_fares_to(self, crs_code, save=False, **kwargs):
+        # Validate that the destination station exists in the network
+        if crs_code not in self.stations:
+            raise ValueError(f"Destination station {crs_code} not found in the network.")
+
+        # Get the destination station
+        destination_station = self.stations[crs_code]
+
+        # Calculate fare prices to the destination station from all other stations
+        fare_prices = []
+        for station in self.stations.values():
+            if station != destination_station:
+                try:
+                    fare = self.journey_fare(station.crs, crs_code)
+                    fare_prices.append(fare)
+                except ValueError:
+                    # Unable to plan a journey, skip computing fare
+                    pass
+
+        # Plot the histogram
+        plt.hist(fare_prices, **kwargs)
+        plt.title(f"Fare Prices to {destination_station.name.replace(' ','_')}")
+        plt.xlabel("Fare Price (£-GBP)")
+        plt.ylabel("Frequency")
+
+        if save:
+            # Replace spaces with underscores in the station name for filename
+            filename = f"Fare_prices_to_{destination_station.name.replace(' ', '_')}.png"
+            plt.savefig(filename)
+        else:
+            plt.show()
 
     def plot_network(self, marker_size: int = 5) -> None:
         """
@@ -249,10 +278,11 @@ class RailNetwork: #brings together all the stations from a dataset
 #print(f"Keys of rail_network.stations: {list(rail_network.stations.keys())}")   #this operates as usual but it doesnt showcase the full string for some reason 06/11/2023
 
 if __name__ == "__main__":
-    # brighton = Station("Brighton", "South East", "BTN", 50.829659, -0.141234, True) 
-    # kings_cross = Station("London Kings Cross", "London", "KGX", 51.530827, -0.122907, True)
+    brighton = Station("Brighton", "South East", "BTN", 50.829659, -0.141234, True) 
+    kings_cross = Station("London Kings Cross", "London", "KGX", 51.530827, -0.122907, True)
     # edinburgh_park = Station("Edinburgh Park", "Scotland", "EDP", 55.927615, -3.307829, False)
-
+    #print(brighton)
+    
     # Import read_rail_network function from utilities only when needed   
     from utilities import read_rail_network
 
@@ -269,6 +299,8 @@ if __name__ == "__main__":
     # edinburgh_park = Station("Edinburgh Park", "Scotland", "EDP", 55.927615, -3.307829, False)
     # print(rail_network.closest_hub(edinburgh_park))
     #print(rail_network.journey_planner("BTN", "KGX"))      
-    print(rail_network.journey_fare("ABW", "TQY", summary=True))
+    #print(rail_network.journey_fare("ABW", "TQY", summary=True))
+    rail_network.plot_fares_to('KGX', save=True, bins=10)
 
+    
 
