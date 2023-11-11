@@ -110,3 +110,31 @@ def test_rail_network_n_stations():
     rail_network = RailNetwork(list_of_stations)
     assert rail_network.n_stations() == 2   #tests n_stations method
 
+def test_hub_stations():
+    # Test the hub_stations method
+    hub_station_a = Station("Hub Station A", "Region A", "HBA", 0, 0, True)
+    hub_station_b = Station("Hub Station B", "Region B", "HBB", 0, 1, True)
+    non_hub_station = Station("Non-Hub Station", "Region B", "NHB", 0, 2, False)
+    
+    rail_network = RailNetwork([hub_station_a, hub_station_b, non_hub_station])
+
+    # Test without specifying a region
+    assert len(rail_network.hub_stations()) == 2
+
+    # Test specifying a region
+    assert len(rail_network.hub_stations("Region B")) == 1
+
+# def test_closest_hub():
+#     # Test the closest_hub method
+#     hub_station_a = Station("Hub Station A", "Region A", "HBA", 0, 0, True)
+#     non_hub_station_a = Station("Non-Hub Station A", "Region A", "NHA", 0, 1, False)
+#     hub_station_b = Station("Hub Station B", "Region B", "HBB", 0, 2, True)
+#     non_hub_station_b = Station("Non-Hub Station B", "Region B", "NHB", 0, 3, False)
+
+#     rail_network = RailNetwork([hub_station_a, non_hub_station_a, hub_station_b, non_hub_station_b])
+
+#     # Test when a hub station exists in the same region
+#     assert rail_network.closest_hub(non_hub_station_a) == hub_station_a
+
+#     # Test when a hub station exists in a different region
+#     assert rail_network.closest_hub(non_hub_station_b) == hub_station_b
