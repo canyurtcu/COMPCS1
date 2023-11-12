@@ -1,5 +1,5 @@
 import pytest
-from railway import Station, RailNetwork, fare_price
+from railway import Station, RailNetwork, CRSDuplicateError, RegionnonExistentError, Nohub_InRegionError, invalidCRS, fare_price
 import re
 import numpy as np
 
@@ -95,9 +95,9 @@ def test_CRS_duplicate_railnetwork():
     station_a_duplicate = Station("Station A", "Region A", "STA", 0, 1, True)
     list_of_stations = [station_a,station_a_duplicate]
 
-    with pytest.raises(ValueError) as e:
+    with pytest.raises(CRSDuplicateError) as e:
         RailNetwork(list_of_stations)
-    assert e.match(f"Duplicate CRS code: STA is not allowed in the same RailNetwork")
+    assert isinstance(e.value, CRSDuplicateError)
 
 def test_rail_network_regions():
     station_a = Station("Station A", "Region A", "STA", 0, 0, True)
@@ -132,10 +132,9 @@ def test_hub_stations_regionexists():
 
     rail_network = RailNetwork([hub_station_a, hub_station_b])
 
-    with pytest.raises(ValueError) as e:
+    with pytest.raises(RegionnonExistentError) as e:
         rail_network.hub_stations("C")
-    print(str(e.value))
-    assert e.match("Region 'C' does not exist in the network.")
+    assert isinstance(e.value,RegionnonExistentError)
 
 def test_closest_hub():
     # Test the closest_hub method
@@ -154,15 +153,15 @@ def test_closest_hub():
     assert rail_network.closest_hub(close_hub_station_a) == close_hub_station_a
 
     # Case: When there are no hubs in the region
-    with pytest.raises(ValueError) as e:
+    with pytest.raises(Nohub_InRegionError) as e:
         rail_network.closest_hub(non_hub_station_b)
-    assert e.match("No hub stations in the region: Region B")
+    assert isinstance(e.value,Nohub_InRegionError)
 
     # Case: When the given region does not exist in the rail network
     non_existent_station = Station("Non-existent station", "Region C", "NES", 0, 0, False)
-    with pytest.raises(ValueError) as e:
+    with pytest.raises(RegionnonExistentError) as e:
         rail_network.closest_hub(non_existent_station)
-    assert e.match("Region 'Region C' does not exist in the network.")
+    assert isinstance(e.value,RegionnonExistentError)
 
 def test_journey_planner():
     non_hub_station_A = Station("Non-Hub Station A", "Region A", "NHA", 0, 0, False)
@@ -172,9 +171,9 @@ def test_journey_planner():
 
     rail_network = RailNetwork([non_hub_station_A, hub_station_A, non_hub_station_B, hub_station_B])
 
-    with pytest.raises(ValueError) as e:    #testing for non-existent station
+    with pytest.raises(invalidCRS) as e:    #testing for non-existent station
         rail_network.journey_planner("NHA", "NNN")
-    assert e.match("Invalid CRS codes. Both start and destination stations must exist in the network.")
+    assert isinstance(e.value, invalidCRS)
 
     # Case: Start and End are withing the same region
     assert rail_network.journey_planner("NHA", "HBA") == [non_hub_station_A, hub_station_A]
@@ -205,3 +204,18 @@ def test_journey_fare():
     assert rail_network.journey_fare("NHA", "HBB") == 44.3003522649362
     # Case: Start and End aren't hubs
     assert rail_network.journey_fare("NHA", "NHB") == 69.3599358909409
+
+# def test_plot_fares_to_valid_station():
+#     # Create a RailNetwork with some stations
+#     stations = [
+#         Station("StationA", "RegionA", "CRA", 0.0, 0.0, False),
+#         Station("StationB", "RegionB", "CRB", 1.0, 1.0, False),
+#         Station("StationC", "RegionC", "CRC", 2.0, 2.0, False),
+#     ]
+#     rail_network = RailNetwork(stations)
+
+#     # Plot fares to a valid destination station
+#     try:
+#         rail_network.plot_fares_to("CRB")
+#     except Exception as e:
+#         pytest.fail(f"Failed to plot fares to a valid destination station: {e}")

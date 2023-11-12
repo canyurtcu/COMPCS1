@@ -3,6 +3,22 @@ import numpy as np
 from pathlib import Path
 from typing import List, Dict
 
+class CRSDuplicateError(Exception):
+    """Exception raised when there are duplicate CRS codes."""
+    pass
+
+class RegionnonExistentError(Exception):
+    """Exception raised when given region doesn't exist in the network."""
+    pass
+
+class Nohub_InRegionError(Exception):
+    """Exception raised when given a given region has no hubs."""
+    pass
+
+class invalidCRS(Exception):
+    """Exception raised when given CRS is invalid."""
+    pass
+
 def fare_price(distance, different_regions, hubs_in_dest_region): 
     """
     This function computes approximation of the cost of a rail fare between two stations.
@@ -16,7 +32,7 @@ def fare_price(distance, different_regions, hubs_in_dest_region):
     return calculated_fare_price
 
 class Station: #represents single station
-    def __init__(self, name, region, crs, lat, lon, hub):
+    def __init__(self, name:str, region:str, crs:str, lat:float, lon:float, hub:bool):
         # Check and store name as a string
         if not isinstance(name, str):   
             raise ValueError("Name must be a string")
@@ -72,7 +88,7 @@ class RailNetwork: #brings together all the stations from a dataset
         
         for station in stations:
             if station.crs in self.stations:
-                raise ValueError(f"Duplicate CRS code: {station.crs} is not allowed in the same RailNetwork")
+                raise CRSDuplicateError(f"Duplicate CRS code: {station.crs} is not allowed in the same RailNetwork")
             
             self.stations[station.crs] = station
 
@@ -90,13 +106,13 @@ class RailNetwork: #brings together all the stations from a dataset
         if region is None:
             return [station for station in self.stations.values() if station.hub]
         elif region not in self.regions():
-            raise ValueError(f"Region '{region}' does not exist in the network.")
+            raise RegionnonExistentError(f"Region '{region}' does not exist in the network.")
         else:
             return [station for station in self.stations.values() if station.hub and station.region == region]
 
     def closest_hub(self, s):
         if s.region not in self.regions():
-            raise ValueError(f"Region '{s.region}' does not exist in the network.")
+            raise RegionnonExistentError(f"Region '{s.region}' does not exist in the network.")
 
         if s.hub:
             return s  # If the station itself is a hub, return it
@@ -108,7 +124,7 @@ class RailNetwork: #brings together all the stations from a dataset
 
         if not hub_stations_in_region:
             # If there are no hub stations in the region, raise an appropriate error
-            raise ValueError(f"No hub stations in the region: {region}")
+            raise Nohub_InRegionError(f"No hub stations in the region: {region}")
 
         # Find the closest hub station using the distance_to method
         closest_hub_station = min(hub_stations_in_region, key=lambda hub: s.distance_to(hub))
@@ -117,7 +133,7 @@ class RailNetwork: #brings together all the stations from a dataset
 
     def journey_planner(self, start, dest):
         if start not in self.stations or dest not in self.stations:
-            raise ValueError("Invalid CRS codes. Both start and destination stations must exist in the network.")
+            raise invalidCRS("Invalid CRS codes. Both start and destination stations must exist in the network.")
 
         start_station = self.stations[start]
         dest_station = self.stations[dest]
@@ -159,7 +175,6 @@ class RailNetwork: #brings together all the stations from a dataset
             hubs_in_dest_region = sum(station.hub for station in self.stations.values() if station.region == leg_dest.region)
             leg_fare = fare_price(leg_distance, leg_start.region != leg_dest.region, hubs_in_dest_region)
             total_fare += leg_fare
-#        return f"Station({self.crs}-{self.name}/{self.region}{'-hub' if self.hub else ''})"
         if summary:
             # Print the summary
             print(f"Journey from: {start_station.name} ({start}) to {dest_station.name} ({dest})")
@@ -278,16 +293,16 @@ if __name__ == "__main__":
     # list_of_stations = [brighton, kings_cross, edinburgh_park]
     # rail_network = RailNetwork(list_of_stations)
     # print(f"List of stations passed in: {list_of_stations}")
-    station_a = Station("Station A", "Region A", "STA", 0, 0, True)
-    station_b = Station("Station B", "Region B", "STB", 0, 1, True)
-    list_of_stations = [station_a,station_b]
-    rail_network = RailNetwork(list_of_stations)
-    expected_rail_network = [station_a, station_b]
-    #print(expected_rail_network)
-    expected_region = ["Region A", "Region B"]
-    print(type(rail_network.n_stations()))
-    print(type(expected_region))
-    print(expected_region == rail_network.regions())
+    # station_a = Station("Station A", "Region A", "STA", 0, 0, True)
+    # station_b = Station("Station B", "Region B", "STB", 0, 1, True)
+    # list_of_stations = [station_a,station_b]
+    # rail_network = RailNetwork(list_of_stations)
+    # expected_rail_network = [station_a, station_b]
+    # #print(expected_rail_network)
+    # expected_region = ["Region A", "Region B"]
+    # print(type(rail_network.n_stations()))
+    # print(type(expected_region))
+    # print(expected_region == rail_network.regions())
     
     #print(str(rail_network) == str(expected_rail_network))
     # print(f"Stations in the network: {list(rail_network.stations.values())}")
