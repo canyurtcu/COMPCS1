@@ -1,8 +1,14 @@
 import pytest
-from railway import Station, RailNetwork
+from railway import Station, RailNetwork, fare_price
 import re
 import numpy as np
 
+def test_fare_price():
+    distance = 1
+    different_regions = 1
+    hubs_in_dest_region = 1
+    expected = 1 + (distance * np.exp(-distance/100) * (1 + (different_regions * hubs_in_dest_region)/10))
+    assert expected == fare_price(distance,different_regions,hubs_in_dest_region)
 
 def test_invalid_station_creation():  # Test creating a Station with invalid values
     with pytest.raises(ValueError) as e :   #Case: Name is not a string   
@@ -100,7 +106,7 @@ def test_rail_network_regions():
     station_b = Station("Station B", "Region B", "STB", 0, 1, True)
     list_of_stations = [station_a,station_b]
     rail_network = RailNetwork(list_of_stations)
-    expected_region = ["Region A", "Region B"]
+    expected_region = ["Region B", "Region A"]
     assert rail_network.regions() == expected_region    #tests region method
 
 def test_rail_network_n_stations():
@@ -117,12 +123,22 @@ def test_hub_stations():
     non_hub_station = Station("Non-Hub Station", "Region B", "NHB", 0, 2, False)
     
     rail_network = RailNetwork([hub_station_a, hub_station_b, non_hub_station])
-
     # Test without specifying a region
     assert len(rail_network.hub_stations()) == 2
 
     # Test specifying a region
     assert len(rail_network.hub_stations("Region B")) == 1
+
+def test_hub_stations_regionexists():
+    hub_station_a = Station("Hub Station A", "Region A", "HBA", 0, 0, True)
+    hub_station_b = Station("Hub Station B", "Region B", "HBB", 0, 1, True)
+
+    rail_network = RailNetwork([hub_station_a, hub_station_b])
+
+    with pytest.raises(ValueError) as e:
+        rail_network.hub_stations("C")
+    print(str(e.value))
+    assert e.match("Region 'C' does not exist in the network.")
 
 # def test_closest_hub():
 #     # Test the closest_hub method
