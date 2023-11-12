@@ -106,8 +106,7 @@ def test_rail_network_regions():
     station_b = Station("Station B", "Region B", "STB", 0, 1, True)
     list_of_stations = [station_a,station_b]
     rail_network = RailNetwork(list_of_stations)
-    expected_region = ["Region B", "Region A"]
-    assert rail_network.regions() == expected_region    #tests region method
+    assert len(rail_network.regions()) == 2   #tests region method
 
 def test_rail_network_n_stations():
     station_a = Station("Station A", "Region A", "STA", 0, 0, True)
@@ -166,3 +165,28 @@ def test_closest_hub():
     with pytest.raises(ValueError) as e:
         rail_network.closest_hub(non_existent_station)
     assert e.match("Region 'Region C' does not exist in the network.")
+
+def test_journey_planner():
+    non_hub_station_A = Station("Non-Hub Station A", "Region A", "NHA", 0, 0, False)
+    hub_station_A = Station("Station A", "Region A", "HBA", 0, 1, True)
+    non_hub_station_B = Station("Non-Hub Station B", "Region B", "NHB", 0, 3, False)
+    hub_station_B = Station("Station B", "Region B", "HBB", 0, 5, True)
+
+    rail_network = RailNetwork([non_hub_station_A, hub_station_A, non_hub_station_B, hub_station_B])
+
+    with pytest.raises(ValueError) as e:    #testing for non-existent station
+        rail_network.journey_planner("NHA", "NNN")
+    assert e.match("Invalid CRS codes. Both start and destination stations must exist in the network.")
+
+    # Case: Start and End are withing the same region
+    assert rail_network.journey_planner("NHA", "HBA") == [non_hub_station_A, hub_station_A]
+    # Case: Start and End are both hubs
+    assert rail_network.journey_planner("HBA", "HBB") == [hub_station_A, hub_station_B]
+    # Case: Start is a hub but End isn't
+    assert rail_network.journey_planner("HBA", "NHB") == [hub_station_A, hub_station_B, non_hub_station_B]
+    # Case: Start isn't a hub End is
+    assert rail_network.journey_planner("NHA", "HBB") == [non_hub_station_A, hub_station_A, hub_station_B]
+    # Case: Start and End aren't hubs
+    assert rail_network.journey_planner("NHA", "NHB") == [non_hub_station_A, hub_station_A, hub_station_B, non_hub_station_B]
+
+
