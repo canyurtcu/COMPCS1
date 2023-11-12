@@ -140,17 +140,29 @@ def test_hub_stations_regionexists():
     print(str(e.value))
     assert e.match("Region 'C' does not exist in the network.")
 
-# def test_closest_hub():
-#     # Test the closest_hub method
-#     hub_station_a = Station("Hub Station A", "Region A", "HBA", 0, 0, True)
-#     non_hub_station_a = Station("Non-Hub Station A", "Region A", "NHA", 0, 1, False)
-#     hub_station_b = Station("Hub Station B", "Region B", "HBB", 0, 2, True)
-#     non_hub_station_b = Station("Non-Hub Station B", "Region B", "NHB", 0, 3, False)
+def test_closest_hub():
+    # Test the closest_hub method
+    station_a = Station("Station A", "Region A", "STA", 0, 0, False)
+    close_hub_station_a = Station("Close Hub Station", "Region A", "CHA", 0, 1, True)
+    far_hub_station_a = Station("Far Hub Station", "Region A", "FHA", 10, 10, True)
 
-#     rail_network = RailNetwork([hub_station_a, non_hub_station_a, hub_station_b, non_hub_station_b])
+    non_hub_station_b = Station("Non-Hub Station B", "Region B", "NHB", 0, 3, False)
 
-#     # Test when a hub station exists in the same region
-#     assert rail_network.closest_hub(non_hub_station_a) == hub_station_a
+    rail_network = RailNetwork([station_a, close_hub_station_a, far_hub_station_a, non_hub_station_b])
 
-#     # Test when a hub station exists in a different region
-#     assert rail_network.closest_hub(non_hub_station_b) == hub_station_b
+    # Case: When there are hubs in the region, and the station is not a hub
+    assert rail_network.closest_hub(station_a) == close_hub_station_a
+
+    # Case: When there are hubs in the region, and the station is a hub
+    assert rail_network.closest_hub(close_hub_station_a) == close_hub_station_a
+
+    # Case: When there are no hubs in the region
+    with pytest.raises(ValueError) as e:
+        rail_network.closest_hub(non_hub_station_b)
+    assert e.match("No hub stations in the region: Region B")
+
+    # Case: When the given region does not exist in the rail network
+    non_existent_station = Station("Non-existent station", "Region C", "NES", 0, 0, False)
+    with pytest.raises(ValueError) as e:
+        rail_network.closest_hub(non_existent_station)
+    assert e.match("Region 'Region C' does not exist in the network.")
