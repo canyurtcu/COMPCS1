@@ -82,8 +82,6 @@ def test_str_representation():
     assert str(hub_station) == "Station(HUB-Hub Station/Hub Region-hub)"
     assert str(non_hub_station) == "Station(NHB-Non-Hub Station/Non-Hub Region)"
 
-#Add __repr__ when you have figured it out
-
 def test_railnetworkcreation():
     station_a = Station("Station A", "Region A", "STA", 0, 0, True)
     station_b = Station("Station B", "Region B", "STB", 0, 1, True)
@@ -189,4 +187,21 @@ def test_journey_planner():
     # Case: Start and End aren't hubs
     assert rail_network.journey_planner("NHA", "NHB") == [non_hub_station_A, hub_station_A, hub_station_B, non_hub_station_B]
 
+def test_journey_fare():
+    non_hub_station_A = Station("Non-Hub Station A", "Region A", "NHA", 0, 0, False)
+    hub_station_A = Station("Station A", "Region A", "HBA", 0, 1, True)
+    non_hub_station_B = Station("Non-Hub Station B", "Region B", "NHB", 0, 3, False)
+    hub_station_B = Station("Station B", "Region B", "HBB", 0, 5, True)
 
+    rail_network = RailNetwork([non_hub_station_A, hub_station_A, non_hub_station_B, hub_station_B])
+
+    # Case: Start and End are withing the same region
+    assert rail_network.journey_fare("NHA", "HBA") == 37.57392265256913
+    # Case: Start and End are both hubs
+    assert rail_network.journey_fare("HBA", "HBB") == 6.726429612367068
+    # Case: Start is a hub but End isn't
+    assert rail_network.journey_fare("HBA", "NHB") == 31.786013238371776
+    # Case: Start isn't a hub End is
+    assert rail_network.journey_fare("NHA", "HBB") == 44.3003522649362
+    # Case: Start and End aren't hubs
+    assert rail_network.journey_fare("NHA", "NHB") == 69.3599358909409
