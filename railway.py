@@ -64,10 +64,10 @@ class Station: #represents single station
         self.hub = hub
 
     def __str__(self):
-        return f"Station({self.crs}-{self.name}/{self.region}{'-hub' if self.hub else ''})"
+        return f"Station({self.crs}-{self.name}/{self.region}{'-hub' if self.hub else ''})" #string representation
     
     def __repr__(self):
-        return f"Station({self.crs}-{self.name}/{self.region}{'-hub' if self.hub else ''})" #this doesnt work as intended, fix later
+        return f"Station({self.crs}-{self.name}/{self.region}{'-hub' if self.hub else ''})" 
     
     def distance_to(self, other_station):
         R = 6371
@@ -96,18 +96,18 @@ class RailNetwork: #brings together all the stations from a dataset
         return f"{list(self.stations.values())}"
     
     def regions(self):
-        unique_regions = set(station.region for station in self.stations.values())
+        unique_regions = set(station.region for station in self.stations.values())   #goes through the list of stations, and assigns each unique regiong to a variable
         return list(unique_regions)
 
     def n_stations(self):
         return len(self.stations)
 
     def hub_stations(self, region: str = None):
-        if region is None:
+        if region is None:  #if no specific region is provided returns all hub stations in the network
             return [station for station in self.stations.values() if station.hub]
-        elif region not in self.regions():
+        elif region not in self.regions():  #if provided region does not exist in the network, raises an error
             raise RegionnonExistentError(f"Region '{region}' does not exist in the network.")
-        else:
+        else:   #returns all hub stations in the region provided
             return [station for station in self.stations.values() if station.hub and station.region == region]
 
     def closest_hub(self, s):
@@ -126,7 +126,7 @@ class RailNetwork: #brings together all the stations from a dataset
             # If there are no hub stations in the region, raise an appropriate error
             raise Nohub_InRegionError(f"No hub stations in the region: {region}")
 
-        # Find the closest hub station using the distance_to method
+        # Find the closest hub station using the distance_to() method
         closest_hub_station = min(hub_stations_in_region, key=lambda hub: s.distance_to(hub))
 
         return closest_hub_station
@@ -162,8 +162,6 @@ class RailNetwork: #brings together all the stations from a dataset
     def journey_fare(self, start, dest, summary=False):
         start_station = self.stations[start]
         dest_station = self.stations[dest] 
-        closest_hub_start = self.closest_hub(start_station)
-        closest_hub_dest = self.closest_hub(dest_station)
         # Use journey_planner to get the journey details
         journey = self.journey_planner(start, dest)
         # Calculate the fare for each leg of the journey
