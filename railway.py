@@ -161,7 +161,7 @@ class RailNetwork: #brings together all the stations from a dataset
 
     def journey_fare(self, start, dest, summary=False):
         start_station = self.stations[start]
-        dest_station = self.stations[dest] 
+        dest_station = self.stations[dest]  
         # Use journey_planner to get the journey details
         journey = self.journey_planner(start, dest)
         # Calculate the fare for each leg of the journey
@@ -280,50 +280,10 @@ class RailNetwork: #brings together all the stations from a dataset
         return
 
 
-   #this operates as usual but it doesnt showcase the full string for some reason 06/11/2023
-
 if __name__ == "__main__":
     from utilities import read_rail_network     # Import read_rail_network function from utilities only when needed   
-    # brighton = Station("Brighton", "South East", "BTN", 50.829659, -0.141234, True) 
-    # kings_cross = Station("London Kings Cross", "London", "KGX", 51.530827, -0.122907, True)
-    # edinburgh_park = Station("Edinburgh Park", "Scotland", "EDP", 55.927615, -3.307829, False)
-    
-    # list_of_stations = [brighton, kings_cross, edinburgh_park]
-    # rail_network = RailNetwork(list_of_stations)
-    # print(f"List of stations passed in: {list_of_stations}")
-    # station_a = Station("Station A", "Region A", "STA", 0, 0, True)
-    # station_b = Station("Station B", "Region B", "STB", 0, 1, True)
-    # list_of_stations = [station_a,station_b]
-    # rail_network = RailNetwork(list_of_stations)
-    # expected_rail_network = [station_a, station_b]
-    # #print(expected_rail_network)
-    # expected_region = ["Region A", "Region B"]
-    # print(type(rail_network.n_stations()))
-    # print(type(expected_region))
-    # print(expected_region == rail_network.regions())
-    
-    #print(str(rail_network) == str(expected_rail_network))
-    # print(f"Stations in the network: {list(rail_network.stations.values())}")
-    #print(f"Keys of rail_network.stations: {list(rail_network.stations.keys())}")
-    
 
-    # file_path = Path("uk_stations.csv")
-    # rail_network = read_rail_network(file_path)
-    #for x in list(rail_network.stations.values()): print(x)
-
-    # BTN_to_KGX = brighton.distance_to(kings_cross)
-    # print(BTN_to_KGX)
-
-    # print("Unique Regions:", rail_network.regions())
-    # print("Total Number of Stations:", rail_network.n_stations())
-    # print(len(rail_network.hub_stations('North West')))
-    # edinburgh_park = Station("Edinburgh Park", "Scotland", "EDP", 55.927615, -3.307829, False)
-    # print(rail_network.closest_hub(edinburgh_park))
-    #print(rail_network.journey_planner("BTN", "KGX"))      
-    #print(rail_network.journey_fare("ABW", "TQY", summary=True))
-    #rail_network.plot_fares_to('KGX', save=True, bins=10)
-    #print(brighton)
-
+    #Required code is ran here
 
     
 
