@@ -205,17 +205,28 @@ def test_journey_fare():
     # Case: Start and End aren't hubs
     assert rail_network.journey_fare("NHA", "NHB") == 69.3599358909409
 
-# def test_plot_fares_to_valid_station():
-#     # Create a RailNetwork with some stations
-#     stations = [
-#         Station("StationA", "RegionA", "CRA", 0.0, 0.0, False),
-#         Station("StationB", "RegionB", "CRB", 1.0, 1.0, False),
-#         Station("StationC", "RegionC", "CRC", 2.0, 2.0, False),
-#     ]
-#     rail_network = RailNetwork(stations)
+def test_plot_fares_to_valid_station():
+    # Create a RailNetwork with some stations
+    stations = [
+        Station("StationA", "RegionA", "CRA", 0.0, 0.0, True),
+        Station("StationB", "RegionB", "CRB", 1.0, 1.0, True),
+        Station("StationC", "RegionC", "CRC", 2.0, 2.0, True),
+    ]
+    rail_network = RailNetwork(stations)
 
-#     # Plot fares to a valid destination station
-#     try:
-#         rail_network.plot_fares_to("CRB")
-#     except Exception as e:
-#         pytest.fail(f"Failed to plot fares to a valid destination station: {e}")
+    # Plot fares to a valid destination station
+    try:
+        rail_network.plot_fares_to("CRB")
+    except Exception as e:
+        pytest.fail(f"Failed to plot fares to a valid destination station: {e}")
+
+def test_plot_fares_to_CRS():   #tests the validity of the CRS code given
+    stations = [    
+        Station("StationA", "RegionA", "CRA", 0.0, 0.0, True),
+        Station("StationB", "RegionB", "CRB", 1.0, 1.0, True),
+        Station("StationC", "RegionC", "CRC", 2.0, 2.0, True),
+    ]
+    rail_network = RailNetwork(stations)
+    with pytest.raises(invalidCRS) as e:
+        rail_network.plot_fares_to("NNN")
+    assert isinstance(e.value, invalidCRS)

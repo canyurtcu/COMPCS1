@@ -186,7 +186,7 @@ class RailNetwork: #brings together all the stations from a dataset
     def plot_fares_to(self, crs_code, save=False, **kwargs):
         # Validate that the destination station exists in the network
         if crs_code not in self.stations:
-            raise ValueError(f"Destination station {crs_code} not found in the network.")
+            raise invalidCRS(f"Destination station {crs_code} not found in the network.")
 
         # Get the destination station
         destination_station = self.stations[crs_code]
